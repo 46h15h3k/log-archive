@@ -2,8 +2,6 @@
 
 A simple CLI tool that compresses logs from any directory into a timestamped `.tar.gz` archive and keeps an activity log of every run.
 
-> Project page: https://roadmap.sh/projects/log-archive-tool
-
 ---
 
 ## Features
@@ -27,7 +25,7 @@ A simple CLI tool that compresses logs from any directory into a timestamped `.t
 
 ```bash
 # 1. Clone the repository
-https://github.com/46h15h3k/Log-Archive-Tool.git
+https://github.com/46h15h3k/log-archive.git
 
 # 2. Make it executable
 chmod +x log-archive
