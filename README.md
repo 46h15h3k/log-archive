@@ -1,4 +1,4 @@
-# log-archive
+# Log Archive Tool
 
 A simple CLI tool that compresses logs from any directory into a timestamped `.tar.gz` archive and keeps an activity log of every run.
 
