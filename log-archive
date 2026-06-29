@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+# log-archive - Compress and archive logs from a specified directory
+# Usage: log-archive <log-directory>
+
+set -euo pipefail
+
+# ── helpers ────────────────────────────────────────────────────────────────────
+
+usage() {
+  echo "Usage: log-archive <log-directory>"
+  echo ""
+  echo "  Compresses all files in <log-directory> into a timestamped .tar.gz"
+  echo "  archive and stores it in ~/logs_archive/."
+  echo ""
+  echo "Example:"
+  echo "  log-archive /var/log"
+  exit 1
+}
+
+log_msg() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
+}
+
+# ── argument validation ────────────────────────────────────────────────────────
+
+if [[ $# -ne 1 ]]; then
+  echo "Error: exactly one argument required."
+  usage
+fi
+
+LOG_DIR="$1"
+
+if [[ ! -d "$LOG_DIR" ]]; then
+  echo "Error: '$LOG_DIR' is not a directory or does not exist."
+  exit 1
+fi
+
+# ── setup paths ────────────────────────────────────────────────────────────────
+
+ARCHIVE_DIR="${HOME}/logs_archive"
+TIMESTAMP="$(date '+%Y%m%d_%H%M%S')"
+ARCHIVE_NAME="logs_archive_${TIMESTAMP}.tar.gz"
+ARCHIVE_PATH="${ARCHIVE_DIR}/${ARCHIVE_NAME}"
+ACTIVITY_LOG="${ARCHIVE_DIR}/archive_activity.log"
+
+mkdir -p "$ARCHIVE_DIR"
+
+# ── compress ───────────────────────────────────────────────────────────────────
+
+log_msg "Starting archive of '${LOG_DIR}' ..."
+
+# Use --ignore-failed-read so unreadable files (e.g. root-owned logs) are skipped
+# rather than aborting the whole run.  The 2>/dev/null suppresses permission
+# warnings; remove it if you want to see them.
+if tar \
+  --ignore-failed-read \
+  -czf "$ARCHIVE_PATH" \
+  -C "$(dirname "$LOG_DIR")" \
+  "$(basename "$LOG_DIR")" \
+  2>/dev/null; then
+
+  SIZE="$(du -sh "$ARCHIVE_PATH" | cut -f1)"
+  ENTRY="$(date '+%Y-%m-%d %H:%M:%S') | source=${LOG_DIR} | archive=${ARCHIVE_NAME} | size=${SIZE}"
+
+  echo "$ENTRY" >> "$ACTIVITY_LOG"
+
+  log_msg "Archive created successfully."
+  log_msg "  Path : ${ARCHIVE_PATH}"
+  log_msg "  Size : ${SIZE}"
+  log_msg "Activity logged to: ${ACTIVITY_LOG}"
+else
+  echo "Error: tar failed. Archive may be incomplete." >&2
+  exit 1
+fi
