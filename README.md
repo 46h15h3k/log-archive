@@ -98,7 +98,3 @@ crontab -e
 - Files that cannot be read (permission denied) are silently skipped so the rest of the archive is still created.
 
 ---
-
-## Project page
-
-https://roadmap.sh/projects/log-archive-tool
