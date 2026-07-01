@@ -96,5 +96,3 @@ crontab -e
 - The tool requires **read permission** on the target directory. Run with `sudo` if archiving system logs owned by root.
 - Archives are stored in `~/logs_archive/` by default. The directory is created automatically on first run.
 - Files that cannot be read (permission denied) are silently skipped so the rest of the archive is still created.
-
----
